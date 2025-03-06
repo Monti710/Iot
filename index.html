@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitor de Clima</title>
-    <link rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script type="text/javascript" 
-            src="https://cdn.jsdelivr.net/npm/particle-api-js@10/dist/particle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/particle-api-js@10/dist/particle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.0/d3.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
             display: flex;
@@ -24,15 +21,18 @@
             align-items: center;
             height: 100vh;
             background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
         }
         .container {
             display: flex;
-            gap: 20px;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .card {
-            width: 200px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 220px;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 20px;
@@ -40,21 +40,41 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
             text-align: center;
-            transition: transform 0.3s;
         }
         .card:hover {
             transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #ffdd57;
+            animation: float 3s ease-in-out infinite;
         }
         .value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+        .label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        .loading {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
@@ -62,53 +82,88 @@
     <div class="container">
         <div class="card">
             <i class="fa fa-thermometer-half icon"></i>
-            <span class="value" id="Temperatura">??? °C</span>
+            <span class="value" id="Temperatura_C">--- °C</span>
+            <span class="label">Temperatura (°C)</span>
+        </div>
+        <div class="card">
+            <i class="fa fa-thermometer-full icon"></i>
+            <span class="value" id="Temperatura_F">--- °F</span>
+            <span class="label">Temperatura (°F)</span>
         </div>
         <div class="card">
             <i class="fa fa-tint icon"></i>
-            <span class="value" id="Humedad">??? %</span>
+            <span class="value" id="Humedad">--- %</span>
+            <span class="label">Humedad</span>
+        </div>
+        <div class="card">
+            <i class="fa fa-fire icon"></i>
+            <span class="value" id="Heat_Index">--- °C</span>
+            <span class="label">Índice de Calor</span>
         </div>
     </div>
 
     <script>
-        var $Temp = $('#Temperatura');  // asignamos el objeto Temperatura a una variable nueva
-    var $Hum= $('#Humedad'); // asignamos el objeto  Humedad a una variable nueva
-    var temp=0;
-    var hum=0;
-    var particle = new Particle();
-    var token;
-    particle.login({username: '', password: ''}).then(
-        function(data) {
-            token = data.body.access_token;
-        },
-        function (err) {
-            console.log('Could not log in.', err);
-        }
-    );
-    setInterval(function() {
+        var $TempC = $('#Temperatura_C');  // Temperatura en °C
+        var $TempF = $('#Temperatura_F');  // Temperatura en °F
+        var $Hum = $('#Humedad');         // Humedad
+        var $HeatIndex = $('#Heat_Index'); // Índice de calor
+        var particle = new Particle();
+        var token;
 
-    particle.getVariable({ deviceId: '', name: 'TEMP', auth: token }).then(function(data) {
-  
-        console.log('Device variable retrieved successfully:', data);
-        temp=data.body.result;
-        
-    }, function(err) {
-        console.log('An error occurred while getting attrs:', err);
-    });
-      particle.getVariable({ deviceId: '', name: 'HUM', auth: token }).then(function(data) {
-  
-        console.log('Device variable retrieved successfully:', data);
-    hum=data.body.result;
-   
-    }, function(err) {
-  console.log('An error occurred while getting attrs:', err);
-    });
-    Hum = hum.toFixed(2);
-    Temp = temp.toFixed(2);
-    $Hum.text(Hum+" %");
-    $Temp.text(Temp+" °C");
-    },2000);
+        // Función para iniciar sesión en Particle
+        particle.login({ username: 'TU_USUARIO', password: 'TU_CONTRASEÑA' }).then(
+            function(data) {
+                token = data.body.access_token;
+                console.log('Sesión iniciada correctamente.');
+                startMonitoring(); // Iniciar monitoreo después de iniciar sesión
+            },
+            function(err) {
+                console.log('Error al iniciar sesión:', err);
+                showError('Error de conexión. Inténtalo de nuevo.');
+            }
+        );
+
+        // Función para iniciar el monitoreo
+        function startMonitoring() {
+            setInterval(function() {
+                // Obtener temperatura en °C
+                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'TEMP_C', auth: token }).then(function(data) {
+                    $TempC.text(data.body.result.toFixed(2) + " °C").css('color', '#ffdd57');
+                }).catch(function(err) {
+                    console.log('Error al obtener temperatura en °C:', err);
+                });
+
+                // Obtener temperatura en °F
+                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'TEMP_F', auth: token }).then(function(data) {
+                    $TempF.text(data.body.result.toFixed(2) + " °F").css('color', '#ff6b6b');
+                }).catch(function(err) {
+                    console.log('Error al obtener temperatura en °F:', err);
+                });
+
+                // Obtener humedad
+                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'HUM', auth: token }).then(function(data) {
+                    $Hum.text(data.body.result.toFixed(2) + " %").css('color', '#57c7ff');
+                }).catch(function(err) {
+                    console.log('Error al obtener humedad:', err);
+                });
+
+                // Obtener índice de calor
+                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'HEAT_INDEX', auth: token }).then(function(data) {
+                    $HeatIndex.text(data.body.result.toFixed(2) + " °C").css('color', '#ff8c42');
+                }).catch(function(err) {
+                    console.log('Error al obtener índice de calor:', err);
+                });
+            }, 2000); // Actualizar cada 2 segundos
+        }
+
+        // Función para mostrar errores en la interfaz
+        function showError(message) {
+            $TempC.text('--- °C').css('color', 'rgba(255, 255, 255, 0.7)');
+            $TempF.text('--- °F').css('color', 'rgba(255, 255, 255, 0.7)');
+            $Hum.text('--- %').css('color', 'rgba(255, 255, 255, 0.7)');
+            $HeatIndex.text('--- °C').css('color', 'rgba(255, 255, 255, 0.7)');
+            alert(message); // Puedes reemplazar esto con un mensaje en la interfaz
+        }
     </script>
 </body>
 </html>
-
