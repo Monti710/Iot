@@ -111,7 +111,7 @@
         var token;
 
         // Función para iniciar sesión en Particle
-        particle.login({ username: 'TU_USUARIO', password: 'TU_CONTRASEÑA' }).then(
+        particle.login({ username: 'USUARIO', password: 'CONTRASEÑA' }).then(
             function(data) {
                 token = data.body.access_token;
                 console.log('Sesión iniciada correctamente.');
@@ -127,28 +127,28 @@
         function startMonitoring() {
             setInterval(function() {
                 // Obtener temperatura en °C
-                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'TEMP_C', auth: token }).then(function(data) {
+                particle.getVariable({ deviceId: 'IDENTIFICADOR', name: 'TEMP_C', auth: token }).then(function(data) {
                     $TempC.text(data.body.result.toFixed(2) + " °C").css('color', '#ffdd57');
                 }).catch(function(err) {
                     console.log('Error al obtener temperatura en °C:', err);
                 });
 
                 // Obtener temperatura en °F
-                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'TEMP_F', auth: token }).then(function(data) {
+                particle.getVariable({ deviceId: 'IDENTIFICADOR', name: 'TEMP_F', auth: token }).then(function(data) {
                     $TempF.text(data.body.result.toFixed(2) + " °F").css('color', '#ff6b6b');
                 }).catch(function(err) {
                     console.log('Error al obtener temperatura en °F:', err);
                 });
 
                 // Obtener humedad
-                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'HUM', auth: token }).then(function(data) {
+                particle.getVariable({ deviceId: 'IDENTIFICADOR', name: 'HUM', auth: token }).then(function(data) {
                     $Hum.text(data.body.result.toFixed(2) + " %").css('color', '#57c7ff');
                 }).catch(function(err) {
                     console.log('Error al obtener humedad:', err);
                 });
 
                 // Obtener índice de calor
-                particle.getVariable({ deviceId: 'TU_DEVICE_ID', name: 'HEAT_INDEX', auth: token }).then(function(data) {
+                particle.getVariable({ deviceId: 'IDENTIFICADOR', name: 'HEAT_INDEX', auth: token }).then(function(data) {
                     $HeatIndex.text(data.body.result.toFixed(2) + " °C").css('color', '#ff8c42');
                 }).catch(function(err) {
                     console.log('Error al obtener índice de calor:', err);

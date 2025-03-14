@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Dispositivo IoT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #28a745;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Control de Dispositivo IoT</div>
+        <label class="switch">
+            <input type="checkbox" id="toggleSwitch">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <script>
+        var particle = new Particle();
+        var token;
+        
+        particle.login({
+            username: "USUARIO",
+            password: "CONTRASEÑA"
+        }).then(
+            function(data) {
+                token = data.body.access_token;
+                console.log("Login exitoso");
+                
+                // Recuperar el estado previo desde localStorage
+                var savedState = localStorage.getItem("switchState");
+                if (savedState !== null) {
+                    var switchElement = document.getElementById("toggleSwitch");
+                    switchElement.checked = savedState === "1";
+                }
+            },
+            function (err) {
+                console.error("No se pudo iniciar sesión.", err);
+            }
+        );
+        
+        var switchElement = document.getElementById("toggleSwitch");
+        switchElement.addEventListener("change", function() {
+            var isOn = switchElement.checked;
+            
+            // Guardar el estado en localStorage
+            localStorage.setItem("switchState", isOn ? "1" : "0");
+            
+            if (token) {
+                particle.callFunction({
+                    deviceId: "IDENTIFICADOR",
+                    name: "led",
+                    argument: isOn ? "1" : "0",
+                    auth: token
+                }).then(
+                    function(response) {
+                        console.log("Comando enviado: ", response);
+                    },
+                    function(error) {
+                        console.error("Error al enviar comando: ", error);
+                    }
+                );
+            }
+        });
+    </script>
+</body>
+</html>
