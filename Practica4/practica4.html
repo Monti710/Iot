@@ -1,132 +1,339 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Dispositivo IoT</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #28a745;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Control estilo Tinker</title>
+  <!-- Fuentes e iconos (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Librerías de Particle y jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <style>
+    /* ==== ESTILOS GENERALES ==== */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #C9D6FF, #E2E2E2);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #2E3D48;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 0.75rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .main-content {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .tinker-container {
+      background: #FFFFFFDD;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+      max-width: 900px;
+      width: 90%;
+    }
+
+    .device-container {
+      flex: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .device-container img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .pins-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .pins-panel h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .pin-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+
+    .pin-row label {
+      margin-right: 0.75rem;
+      font-weight: 500;
+      font-size: 1rem;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      margin-right: 10px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 100%;
+        height: 100%; 
+        position: absolute; 
+        top: 0;
+        left: 0;
+        z-index: 2;
+        cursor: pointer; 
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #0099ff; 
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .circleState {
+      width: 18px;
+      height: 18px;
+      margin-left: 10px;
+      border-radius: 50%;
+      background-color: red; 
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="title">Control de Dispositivo IoT</div>
-        <label class="switch">
-            <input type="checkbox" id="toggleSwitch">
-            <span class="slider"></span>
-        </label>
-    </div>
+  <header>
+    <h1>Panel de Control</h1>
+  </header>
 
-    <script>
-        var particle = new Particle();
-        var token;
-        
-        particle.login({
-            username: "USUARIO",
-            password: "CONTRASEÑA"
-        }).then(
-            function(data) {
-                token = data.body.access_token;
-                console.log("Login exitoso");
-                
-                // Recuperar el estado previo desde localStorage
-                var savedState = localStorage.getItem("switchState");
-                if (savedState !== null) {
-                    var switchElement = document.getElementById("toggleSwitch");
-                    switchElement.checked = savedState === "1";
-                }
-            },
-            function (err) {
-                console.error("No se pudo iniciar sesión.", err);
-            }
-        );
-        
-        var switchElement = document.getElementById("toggleSwitch");
-        switchElement.addEventListener("change", function() {
-            var isOn = switchElement.checked;
-            
-            // Guardar el estado en localStorage
-            localStorage.setItem("switchState", isOn ? "1" : "0");
-            
-            if (token) {
-                particle.callFunction({
-                    deviceId: "IDENTIFICADOR",
-                    name: "led",
-                    argument: isOn ? "1" : "0",
-                    auth: token
-                }).then(
-                    function(response) {
-                        console.log("Comando enviado: ", response);
-                    },
-                    function(error) {
-                        console.error("Error al enviar comando: ", error);
-                    }
-                );
-            }
-        });
-    </script>
+  <div class="main-content">
+    <div class="tinker-container">
+      <div class="device-container">
+        <img src="download.png" alt="Particle Device"/>
+      </div>
+
+      <div class="pins-panel">
+        <h2>Control de Pines</h2>
+
+        <!-- Cada pin en una fila: etiqueta, switch y círculo de estado -->
+        <div class="pin-row">
+          <label for="toggleSwitchD0">D0</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD0">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD0"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD1">D1</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD1">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD1"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD2">D2</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD2">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD2"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD3">D3</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD3">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD3"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD4">D4</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD4">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD4"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD5">D5</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD5">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD5"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD6">D6</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD6">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD6"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD7">D7</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD7">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD7"></div>
+        </div>
+      </div> <!-- .pins-panel -->
+    </div> <!-- .tinker-container -->
+  </div> <!-- .main-content -->
+
+  <script>
+    /* ============= CONFIGURACIÓN DE PARTICLE ============= */
+    const USERNAME = "USERNAME";
+    const PASSWORD = "PASSWORD";
+    const DEVICE_ID = "DEVIDE_ID";
+
+    // Suponiendo que el firmware define 8 funciones:
+    const FUNCTIONS = [
+      "led0", "led1", "led2", "led3", "led4", "led5", "led6", "led7"
+    ];
+
+    let token = null;
+    const particle = new Particle();
+
+    // 1. Inicia sesión
+    particle.login({ username: USERNAME, password: PASSWORD })
+      .then(data => {
+        token = data.body.access_token;
+        console.log("Login exitoso con Particle");
+
+        // 2. Configurar cada pin (D0..D7)
+        initPin("toggleSwitchD0", "circleD0", "switchStateD0", FUNCTIONS[0]);
+        initPin("toggleSwitchD1", "circleD1", "switchStateD1", FUNCTIONS[1]);
+        initPin("toggleSwitchD2", "circleD2", "switchStateD2", FUNCTIONS[2]);
+        initPin("toggleSwitchD3", "circleD3", "switchStateD3", FUNCTIONS[3]);
+        initPin("toggleSwitchD4", "circleD4", "switchStateD4", FUNCTIONS[4]);
+        initPin("toggleSwitchD5", "circleD5", "switchStateD5", FUNCTIONS[5]);
+        initPin("toggleSwitchD6", "circleD6", "switchStateD6", FUNCTIONS[6]);
+        initPin("toggleSwitchD7", "circleD7", "switchStateD7", FUNCTIONS[7]);
+      })
+      .catch(err => {
+        console.error("No se pudo iniciar sesión con Particle", err);
+      });
+
+    /**
+     * initPin():
+     *   Asocia un checkbox y un "círculo" de estado con una función Particle
+     *   - switchId: ID del checkbox (ej. "toggleSwitchD0")
+     *   - circleId: ID del círculo de color (ej. "circleD0")
+     *   - storageKey: para guardar en localStorage
+     *   - particleFunction: "led0", "led1", etc.
+     */
+    function initPin(switchId, circleId, storageKey, particleFunction) {
+      const switchElement = document.getElementById(switchId);
+      const circleElement = document.getElementById(circleId);
+
+      // Restauramos el estado previo
+      const savedState = localStorage.getItem(storageKey);
+      if (savedState !== null) {
+        const isOn = (savedState === "1");
+        switchElement.checked = isOn;
+        circleElement.style.backgroundColor = isOn ? "green" : "red";
+      } else {
+        circleElement.style.backgroundColor = "red";
+      }
+
+      // Escuchamos cambios del switch
+      switchElement.addEventListener("change", function() {
+        const isOn = switchElement.checked;
+        circleElement.style.backgroundColor = isOn ? "green" : "red";
+        localStorage.setItem(storageKey, isOn ? "1" : "0");
+
+        // Mandar comando a Particle (0=OFF, 1=ON)
+        if (token) {
+          particle.callFunction({
+            deviceId: DEVICE_ID,
+            name: particleFunction,
+            argument: isOn ? "1" : "0",
+            auth: token
+          })
+          .then(response => {
+            console.log(`Pin ${particleFunction}: ${isOn ? "ON" : "OFF"}`, response);
+          })
+          .catch(error => {
+            console.error(`Error con ${particleFunction}:`, error);
+          });
+        }
+      });
+    }
+
+  </script>
 </body>
 </html>
