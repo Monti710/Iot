@@ -180,57 +180,12 @@
 
         <!-- Cada pin en una fila: etiqueta, switch y círculo de estado -->
         <div class="pin-row">
-          <label for="toggleSwitchD0">D0</label>
+          <label for="toggleSwitchD7">D7</label>
           <div class="switch">
-            <input type="checkbox" id="toggleSwitchD0">
+            <input type="checkbox" id="toggleSwitchD7">
             <span class="slider"></span>
           </div>
-          <div class="circleState" id="circleD0"></div>
-        </div>
-
-        <div class="pin-row">
-          <label for="toggleSwitchD1">D1</label>
-          <div class="switch">
-            <input type="checkbox" id="toggleSwitchD1">
-            <span class="slider"></span>
-          </div>
-          <div class="circleState" id="circleD1"></div>
-        </div>
-
-        <div class="pin-row">
-          <label for="toggleSwitchD2">D2</label>
-          <div class="switch">
-            <input type="checkbox" id="toggleSwitchD2">
-            <span class="slider"></span>
-          </div>
-          <div class="circleState" id="circleD2"></div>
-        </div>
-
-        <div class="pin-row">
-          <label for="toggleSwitchD3">D3</label>
-          <div class="switch">
-            <input type="checkbox" id="toggleSwitchD3">
-            <span class="slider"></span>
-          </div>
-          <div class="circleState" id="circleD3"></div>
-        </div>
-
-        <div class="pin-row">
-          <label for="toggleSwitchD4">D4</label>
-          <div class="switch">
-            <input type="checkbox" id="toggleSwitchD4">
-            <span class="slider"></span>
-          </div>
-          <div class="circleState" id="circleD4"></div>
-        </div>
-
-        <div class="pin-row">
-          <label for="toggleSwitchD5">D5</label>
-          <div class="switch">
-            <input type="checkbox" id="toggleSwitchD5">
-            <span class="slider"></span>
-          </div>
-          <div class="circleState" id="circleD5"></div>
+          <div class="circleState" id="circleD7"></div>
         </div>
 
         <div class="pin-row">
@@ -243,12 +198,57 @@
         </div>
 
         <div class="pin-row">
-          <label for="toggleSwitchD7">D7</label>
+          <label for="toggleSwitchD5">D5</label>
           <div class="switch">
-            <input type="checkbox" id="toggleSwitchD7">
+            <input type="checkbox" id="toggleSwitchD5">
             <span class="slider"></span>
           </div>
-          <div class="circleState" id="circleD7"></div>
+          <div class="circleState" id="circleD5"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD4">D4</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD4">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD4"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD3">D3</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD3">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD3"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD2">D2</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD2">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD2"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD1">D1</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD1">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD1"></div>
+        </div>
+
+        <div class="pin-row">
+          <label for="toggleSwitchD0">D0</label>
+          <div class="switch">
+            <input type="checkbox" id="toggleSwitchD0">
+            <span class="slider"></span>
+          </div>
+          <div class="circleState" id="circleD0"></div>
         </div>
       </div> <!-- .pins-panel -->
     </div> <!-- .tinker-container -->
@@ -262,7 +262,7 @@
 
     // Suponiendo que el firmware define 8 funciones:
     const FUNCTIONS = [
-      "led0", "led1", "led2", "led3", "led4", "led5", "led6", "led7"
+      "led7", "led6", "led5", "led4", "led3", "led2", "led1", "led0"
     ];
 
     let token = null;
@@ -274,15 +274,15 @@
         token = data.body.access_token;
         console.log("Login exitoso con Particle");
 
-        // 2. Configurar cada pin (D0..D7)
-        initPin("toggleSwitchD0", "circleD0", "switchStateD0", FUNCTIONS[0]);
-        initPin("toggleSwitchD1", "circleD1", "switchStateD1", FUNCTIONS[1]);
-        initPin("toggleSwitchD2", "circleD2", "switchStateD2", FUNCTIONS[2]);
-        initPin("toggleSwitchD3", "circleD3", "switchStateD3", FUNCTIONS[3]);
-        initPin("toggleSwitchD4", "circleD4", "switchStateD4", FUNCTIONS[4]);
-        initPin("toggleSwitchD5", "circleD5", "switchStateD5", FUNCTIONS[5]);
-        initPin("toggleSwitchD6", "circleD6", "switchStateD6", FUNCTIONS[6]);
-        initPin("toggleSwitchD7", "circleD7", "switchStateD7", FUNCTIONS[7]);
+        // 2. Configurar cada pin (D7..D0)
+        initPin("toggleSwitchD7", "circleD7", "switchStateD7", FUNCTIONS[0]);
+        initPin("toggleSwitchD6", "circleD6", "switchStateD6", FUNCTIONS[1]);
+        initPin("toggleSwitchD5", "circleD5", "switchStateD5", FUNCTIONS[2]);
+        initPin("toggleSwitchD4", "circleD4", "switchStateD4", FUNCTIONS[3]);
+        initPin("toggleSwitchD3", "circleD3", "switchStateD3", FUNCTIONS[4]);
+        initPin("toggleSwitchD2", "circleD2", "switchStateD2", FUNCTIONS[5]);
+        initPin("toggleSwitchD1", "circleD1", "switchStateD1", FUNCTIONS[6]);
+        initPin("toggleSwitchD0", "circleD0", "switchStateD0", FUNCTIONS[7]);
       })
       .catch(err => {
         console.error("No se pudo iniciar sesión con Particle", err);
@@ -291,10 +291,10 @@
     /**
      * initPin():
      *   Asocia un checkbox y un "círculo" de estado con una función Particle
-     *   - switchId: ID del checkbox (ej. "toggleSwitchD0")
-     *   - circleId: ID del círculo de color (ej. "circleD0")
+     *   - switchId: ID del checkbox (ej. "toggleSwitchD7")
+     *   - circleId: ID del círculo de color (ej. "circleD7")
      *   - storageKey: para guardar en localStorage
-     *   - particleFunction: "led0", "led1", etc.
+     *   - particleFunction: "led7", "led6", etc.
      */
     function initPin(switchId, circleId, storageKey, particleFunction) {
       const switchElement = document.getElementById(switchId);
