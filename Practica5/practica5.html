@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Control de TMS - Medidor de Temperatura</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    body {
+      background: linear-gradient(to right, #1e3c72, #2a5298); 
+      color: white; 
+      padding: 20px; 
+      text-align: center; 
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .main-container {
+      display: flex; 
+      justify-content: space-around; 
+      align-items: center; 
+      flex-wrap: wrap;
+    }
+    .left, .center, .right {
+      flex: 1; 
+      max-width: 250px; 
+      margin: 10px;
+    }
+
+    .gauge-container {
+      position: relative;
+      width: 200px;
+      height: 100px;
+      margin: 0 auto;
+      overflow: hidden; 
+    }
+    .gauge-arc {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 200px;      
+      border-radius: 50%; 
+      background: conic-gradient( 
+        #ff9900 0deg    18deg,  
+        #ff3b09 18deg   54deg,  
+        #ff0000 54deg  270deg, 
+        #00ff00 270deg 306deg, 
+        #ffff00 306deg 342deg,  
+        #ff9900 342deg 360deg   
+      );
+    }
+
+    .gauge-center {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #000;
+      border-radius: 50%;
+      top: 90px;
+    }
+
+    .gauge-pointer {
+      position: absolute;
+      width: 4px;      
+      height: 90px;    
+      background: #000;
+      top: 5px;      
+      left: 98px;      
+      transform-origin: bottom center; 
+      transform: rotate(-90deg);
+      transition: transform 0.3s ease-in-out;
+      z-index: 9999;  
+    }
+
+    .gauge-value {
+      margin-top: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffdd57;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1); 
+      backdrop-filter: blur(10px); 
+      border-radius: 15px; 
+      padding: 20px; 
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .card .icon {
+      font-size: 50px; 
+      margin-bottom: 15px; 
+      color: #ffdd57; 
+      animation: float 3s ease-in-out infinite;
+    }
+    .card .value {
+      font-size: 28px; 
+      font-weight: bold; 
+      margin-bottom: 5px;
+    }
+    .card .label {
+      font-size: 16px; 
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); } 
+      50%      { transform: translateY(-10px); }
+    }
+
+    .led {
+      width: 50px; 
+      height: 50px; 
+      border-radius: 50%; 
+      background-color: grey; 
+      margin: 0 auto 10px; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+      transition: background-color 0.3s;
+    }
+    .led-label {
+      font-size: 16px; 
+      color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <h1>Control de TMS - Medidor de Temperatura</h1>
+
+  <div class="main-container">
+    <div class="left">
+      <div class="gauge-container" id="gauge-container">
+        <div class="gauge-arc"></div>
+        <div class="gauge-pointer" id="gauge-pointer"></div>
+        <div class="gauge-center"></div>
+      </div>
+      <div class="gauge-value" id="gauge-value">1</div>
+    </div>
+
+    <div class="center">
+      <div class="card">
+        <i class="fa fa-thermometer-half icon"></i>
+        <span class="value" id="Temperatura_C">-- °C</span>
+        <span class="label">Temperatura (°C)</span>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="led" id="led-indicator"></div>
+      <span class="led-label">LED</span>
+    </div>
+  </div>
+
+  <script>
+    var particle = new Particle();
+    var token;
+    var $TempC = $('#Temperatura_C');
+    var ledIndicator = document.getElementById('led-indicator');
+    var gaugePointer = document.getElementById('gauge-pointer');
+    var gaugeValueEl = document.getElementById('gauge-value');
+    var currentDialValue = 1;
+
+    particle.login({ 
+      username: 'USUARIO', 
+      password: 'CONTRASEÑA'
+    }).then(function(data) {
+      token = data.body.access_token;
+      startMonitoring();
+    }, function(err) {
+      console.log('Error al iniciar sesión: ', err);
+      alert('Error de conexión. Inténtalo de nuevo.');
+    });
+
+    function startMonitoring() {
+      setInterval(function() {
+        particle.getVariable({ 
+          deviceId: 'ID_DISPOSITIVO', 
+          name: 'TEMP_C', 
+          auth: token 
+        }).then(function(data) {
+          var tempValue = data.body.result;
+          $TempC.text(tempValue.toFixed(2) + " °C");
+
+          if (tempValue > currentDialValue) {
+            ledIndicator.style.backgroundColor = 'green';
+          } else {
+            ledIndicator.style.backgroundColor = 'red';
+          }
+        }).catch(function(err) {
+          console.log('Error al obtener temperatura: ', err);
+        });
+      }, 1000);
+    }
+
+    function updateTmsValue(value) {
+      var val = Math.round(Math.max(1, Math.min(100, value)));
+      currentDialValue = val;
+      gaugeValueEl.textContent = val;
+
+      var angle = ((val - 1) / (100 - 1)) * 180 - 90; 
+      gaugePointer.style.transform = 'rotate(' + angle + 'deg)';
+
+      particle.callFunction({ 
+        deviceId: 'ID_DISPOSITIVO', 
+        name: 'TMS_2', 
+        argument: String(val), 
+        auth: token
+      });
+    }
+
+    var isDragging = false;
+
+    document.getElementById("gauge-container").addEventListener('mousedown', function(e) {
+      isDragging = true;
+      document.addEventListener('mousemove', movePointer);
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isDragging) {
+        isDragging = false;
+        document.removeEventListener('mousemove', movePointer);
+      }
+    });
+
+    function movePointer(e) {
+      var rect = gaugePointer.parentElement.getBoundingClientRect();
+      var centerX = rect.left + 100;
+      var centerY = rect.top + 100;
+
+      var x = e.clientX - centerX;
+      var y = e.clientY - centerY;
+
+      var rawAngle = Math.atan2(-y, -x) * (180 / Math.PI); 
+      if (rawAngle < 0) {
+        rawAngle += 360; 
+      }
+      var angle = Math.max(0, Math.min(180, rawAngle));
+
+      gaugePointer.style.transform = 'rotate(' + angle + 'deg)';
+
+      var value = 1 + (angle / 180) * 99;
+      updateTmsValue(value);
+    }
+  </script>
+</body>
+</html>
